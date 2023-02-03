@@ -91,7 +91,7 @@ class FilmControllerTest {
                 .build();
         final ValidationException exception = assertThrows(
                 ValidationException.class,
-                () -> filmController.addFilm(film));
+                () -> filmController.add(film));
         assertEquals("Некорректная дата релиза!", exception.getMessage());
     }
 
