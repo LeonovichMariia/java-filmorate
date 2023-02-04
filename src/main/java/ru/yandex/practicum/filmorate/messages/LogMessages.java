@@ -12,9 +12,4 @@ public enum LogMessages {
     LogMessages(String messageText) {
         this.messageText = messageText;
     }
-
-    @Override
-    public String toString() {
-        return messageText;
-    }
 }

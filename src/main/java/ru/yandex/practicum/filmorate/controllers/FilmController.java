@@ -15,22 +15,19 @@ import java.util.*;
 public class FilmController extends AbstractController<Film> {
     private static final LocalDate BIRTH_DATE_OF_CINEMA = LocalDate.of(1895, 12, 28);
 
-    @GetMapping
     @Override
     public List<Film> getAll() {
         return super.getAll();
     }
 
-    @PostMapping
     @Override
-    public Film add(@Valid @RequestBody Film film) throws ValidationException {
-        return super.add(film);
+    public Film objectAdd(@Valid @RequestBody Film film) throws ValidationException {
+        return super.objectAdd(film);
     }
 
-    @PutMapping
     @Override
-    public Film update(@Valid @RequestBody Film film) throws ValidationException {
-        return super.update(film);
+    public Film objectRenewal(@Valid @RequestBody Film film) throws ValidationException {
+        return super.objectRenewal(film);
     }
 
     public Film validate(Film film) throws ValidationException {

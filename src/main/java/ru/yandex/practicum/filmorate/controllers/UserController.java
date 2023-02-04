@@ -13,22 +13,19 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController extends AbstractController<User> {
 
-    @GetMapping
     @Override
     public List<User> getAll() {
         return super.getAll();
     }
 
-    @PostMapping
     @Override
-    public User add(@Valid @RequestBody User user) {
-        return super.add(user);
+    public User objectAdd(@Valid @RequestBody User user) {
+        return super.objectAdd(user);
     }
 
-    @PutMapping
     @Override
-    public User update(@Valid @RequestBody User user) {
-        return super.update(user);
+    public User objectRenewal(@Valid @RequestBody User user) {
+        return super.objectRenewal(user);
     }
 
     public User validate(User user) throws ValidationException {

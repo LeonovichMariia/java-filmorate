@@ -1,16 +1,22 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 import ru.yandex.practicum.filmorate.messages.AnnotationMessages;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 
 @Data
-@Builder
 public class Film extends Object {
-    private int id;
+    @Builder
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+        super(id);
+        this.name = name;
+        this.description = description;
+        this.releaseDate = releaseDate;
+        this.duration = duration;
+    }
+
     @NotBlank(message = AnnotationMessages.EMPTY_NAME)
     private String name;
     @Size(max = 200, message = AnnotationMessages.LONG_DESCRIPTION)

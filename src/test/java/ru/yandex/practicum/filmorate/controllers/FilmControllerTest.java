@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -89,10 +88,7 @@ class FilmControllerTest {
                 .releaseDate(LocalDate.of(1894, 6, 30))
                 .duration(60)
                 .build();
-        final ValidationException exception = assertThrows(
-                ValidationException.class,
-                () -> filmController.add(film));
-        assertEquals("Некорректная дата релиза!", exception.getMessage());
+        assertThrows(ValidationException.class, () -> filmController.objectAdd(film),"Некорректная дата релиза!");
     }
 
     @Test

@@ -1,6 +1,9 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import ru.yandex.practicum.filmorate.exceptions.ObjectAlreadyExistException;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
@@ -21,34 +24,37 @@ public abstract class AbstractController<T extends Object> {
         return id++;
     }
 
+    @GetMapping
     public List<T> getAll() {
-        log.info(String.valueOf(LogMessages.TOTAL), allObjects.size());
+        log.info(LogMessages.TOTAL.toString(), allObjects.size());
         return new ArrayList<>(allObjects.values());
     }
 
-    public T add(T t) throws ValidationException {
-        validate(t);
-        if (allObjects.containsKey(t.getId())) {
-            log.info(String.valueOf(LogMessages.ALREADY_EXIST), t);
+    @PostMapping
+    public T objectAdd(T object) throws ValidationException {
+        validate(object);
+        if (allObjects.containsKey(object.getId())) {
+            log.info(LogMessages.ALREADY_EXIST.toString(), object);
             throw new ObjectAlreadyExistException("Такой объект уже есть");
         }
-        t.setId(generateId());
-        allObjects.put(t.getId(), t);
-        log.info(String.valueOf(LogMessages.OBJECT_ADD), t);
-        return t;
+        object.setId(generateId());
+        allObjects.put(object.getId(), object);
+        log.info(LogMessages.OBJECT_ADD.toString(), object);
+        return object;
     }
 
-    public T update(T t) throws ValidationException {
-        validate(t);
-        if (allObjects.get(t.getId()) != null) {
-            allObjects.replace(t.getId(), t);
-            log.info(String.valueOf(LogMessages.OBJECT_UPDATE), t);
+    @PutMapping
+    public T objectRenewal(T object) throws ValidationException {
+        validate(object);
+        if (allObjects.get(object.getId()) != null) {
+            allObjects.replace(object.getId(), object);
+            log.info(LogMessages.OBJECT_UPDATE.toString(), object);
         } else {
-            log.info(String.valueOf(LogMessages.OBJECT_NOT_FOUND), t);
+            log.info(LogMessages.OBJECT_NOT_FOUND.toString(), object);
             throw new ObjectNotFoundException("Объект не найден!");
         }
-        return t;
+        return object;
     }
 
-    public abstract T validate(T t) throws ValidationException;
+    public abstract T validate(T object) throws ValidationException;
 }
