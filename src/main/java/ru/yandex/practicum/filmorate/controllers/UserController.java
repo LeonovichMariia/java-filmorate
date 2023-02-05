@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.controllers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
+import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.User;
 
 import javax.validation.Valid;
@@ -13,16 +14,19 @@ import java.util.*;
 @RequestMapping("/users")
 public class UserController extends AbstractController<User> {
 
+    @GetMapping
     @Override
     public List<User> getAll() {
         return super.getAll();
     }
 
+    @PostMapping
     @Override
     public User objectAdd(@Valid @RequestBody User user) {
         return super.objectAdd(user);
     }
 
+    @PutMapping
     @Override
     public User objectRenewal(@Valid @RequestBody User user) {
         return super.objectRenewal(user);
@@ -30,7 +34,7 @@ public class UserController extends AbstractController<User> {
 
     public User validate(User user) throws ValidationException {
         if (user.getName() == null || user.getName().isBlank()) {
-            log.warn("Имя пользователя пустое. Использован логин");
+            log.warn(LogMessages.EMPTY_USER_NAME.toString());
             user.setName(user.getLogin());
         }
         return user;

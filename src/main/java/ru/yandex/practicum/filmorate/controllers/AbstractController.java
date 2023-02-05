@@ -24,18 +24,16 @@ public abstract class AbstractController<T extends Object> {
         return id++;
     }
 
-    @GetMapping
     public List<T> getAll() {
         log.info(LogMessages.TOTAL.toString(), allObjects.size());
         return new ArrayList<>(allObjects.values());
     }
 
-    @PostMapping
     public T objectAdd(T object) throws ValidationException {
         validate(object);
         if (allObjects.containsKey(object.getId())) {
             log.info(LogMessages.ALREADY_EXIST.toString(), object);
-            throw new ObjectAlreadyExistException("Такой объект уже есть");
+            throw new ObjectAlreadyExistException(LogMessages.ALREADY_EXIST.toString());
         }
         object.setId(generateId());
         allObjects.put(object.getId(), object);
@@ -43,7 +41,6 @@ public abstract class AbstractController<T extends Object> {
         return object;
     }
 
-    @PutMapping
     public T objectRenewal(T object) throws ValidationException {
         validate(object);
         if (allObjects.get(object.getId()) != null) {
@@ -51,7 +48,7 @@ public abstract class AbstractController<T extends Object> {
             log.info(LogMessages.OBJECT_UPDATE.toString(), object);
         } else {
             log.info(LogMessages.OBJECT_NOT_FOUND.toString(), object);
-            throw new ObjectNotFoundException("Объект не найден!");
+            throw new ObjectNotFoundException(LogMessages.OBJECT_NOT_FOUND.toString());
         }
         return object;
     }
