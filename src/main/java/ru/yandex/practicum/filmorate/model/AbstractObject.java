@@ -6,6 +6,6 @@ import lombok.*;
 @NoArgsConstructor
 @Getter
 @Setter
-public abstract class Object {
-    private int id;
+public abstract class AbstractObject {
+    private Long id;
 }

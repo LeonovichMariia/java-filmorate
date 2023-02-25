@@ -1,10 +1,12 @@
 package ru.yandex.practicum.filmorate.controllers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.*;
@@ -12,31 +14,68 @@ import java.util.*;
 @Slf4j
 @RestController
 @RequestMapping("/users")
-public class UserController extends AbstractController<User> {
+public class UserController {
+    private final UserService userService;
+
+    @Autowired
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
-    @Override
-    public List<User> getAll() {
-        return super.getAll();
+    public List<User> getAllUsers() {
+        log.info(LogMessages.GET_ALL_USERS.toString());
+        return userService.getAll();
+    }
+
+    @GetMapping("/{id}")
+    public User getUserById(@PathVariable long id) {
+        log.info(LogMessages.GET_FRIEND_BY_ID.toString(), id);
+        return userService.findObjectById(id);
+    }
+
+    @DeleteMapping("/{id}")
+    public void deleteUserById(@PathVariable long id) {
+        log.info(LogMessages.DELETE_USER_BY_ID.toString(), id);
+        userService.deleteObjectById(id);
+        log.info(LogMessages.OBJECT_DELETED.toString(), id);
     }
 
     @PostMapping
-    @Override
-    public User objectAdd(@Valid @RequestBody User user) {
-        return super.objectAdd(user);
+    public User addUser(@Valid @RequestBody User user) throws ValidationException {
+        userService.addObject(user);
+        log.info(LogMessages.OBJECT_ADD.toString(), user);
+        return user;
     }
 
     @PutMapping
-    @Override
-    public User objectRenewal(@Valid @RequestBody User user) {
-        return super.objectRenewal(user);
+    public User userRenewal(@Valid @RequestBody User user) throws ValidationException {
+        userService.renewalObject(user);
+        log.info(LogMessages.OBJECT_UPDATE.toString(), user);
+        return user;
     }
 
-    public User validate(User user) throws ValidationException {
-        if (user.getName() == null || user.getName().isBlank()) {
-            log.warn(LogMessages.EMPTY_USER_NAME.toString());
-            user.setName(user.getLogin());
-        }
-        return user;
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info(LogMessages.ADD_FRIEND.toString(), id, friendId);
+        userService.addFriend(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
+        log.info(LogMessages.REMOVE_FRIEND.toString(), id, friendId);
+        userService.removeFriend(id, friendId);
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable long id) {
+        log.info(LogMessages.GET_FRIENDS.toString());
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
+        log.info(LogMessages.GET_COMMON_FRIENDS.toString());
+        return userService.getCommonFriends(id, otherId);
     }
 }

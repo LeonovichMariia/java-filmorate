@@ -1,15 +1,19 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.yandex.practicum.filmorate.messages.AnnotationMessages;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
-public class Film extends Object {
+@EqualsAndHashCode(callSuper = true)
+public class Film extends AbstractObject {
     @Builder
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration) {
         super(id);
         this.name = name;
         this.description = description;
@@ -25,4 +29,18 @@ public class Film extends Object {
     private LocalDate releaseDate;
     @Positive(message = AnnotationMessages.INCORRECT_DURATION)
     private int duration;
+    @JsonIgnore
+    private final Set<Long> likes = new HashSet<>();
+
+    public void addLike(Long id) {
+        likes.add(id);
+    }
+
+    public void removeLike(Long id) {
+        likes.remove(id);
+    }
+
+    public int getPopularFilmsList() {
+        return likes.size();
+    }
 }

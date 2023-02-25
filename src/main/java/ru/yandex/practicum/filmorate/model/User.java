@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 import ru.yandex.practicum.filmorate.messages.AnnotationMessages;
 
@@ -8,11 +9,16 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Data
-public class User extends Object {
+@EqualsAndHashCode(callSuper = true)
+public class User extends AbstractObject {
     @Builder
-    public User(int id, String email, String login, String name, LocalDate birthday) {
+    public User(Long id, String email, String login, String name, LocalDate birthday) {
         super(id);
         this.email = email;
         this.login = login;
@@ -29,4 +35,18 @@ public class User extends Object {
     private String name;
     @PastOrPresent(message = AnnotationMessages.INCORRECT_BIRTH_DATE)
     private LocalDate birthday;
+    @JsonIgnore
+    private Set<Long> friends = new HashSet<>();
+
+    public void addFriend(Long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(Long id) {
+        friends.remove(id);
+    }
+
+    public List<Long> getFriends() {
+        return new ArrayList<>(friends);
+    }
 }
