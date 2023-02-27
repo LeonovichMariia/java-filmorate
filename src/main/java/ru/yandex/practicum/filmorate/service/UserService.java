@@ -60,15 +60,11 @@ public class UserService extends AbstractService<User> {
     public List<User> getCommonFriends(Long id, Long otherId) {
         User user = storage.findObjectById(id);
         User otherUser = storage.findObjectById(otherId);
-        if (user == null && otherUser == null) {
-            log.warn(LogMessages.NULL_OBJECT.toString());
-            return null;
-        }
+        checkIfObjectNull(user);
+        checkIfObjectNull(otherUser);
         log.info(LogMessages.LIST_OF_COMMON_FRIENDS.toString());
-        assert user != null;
-        List<Long> userFriends = user.getFriends();
-        userFriends.retainAll(otherUser.getFriends());
-        return userFriends.stream()
+        return user.getFriends().stream()
+                .filter(otherUser.getFriends()::contains)
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
     }

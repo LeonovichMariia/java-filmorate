@@ -11,9 +11,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -46,9 +44,5 @@ public class User extends AbstractObject {
 
     public void removeFriend(Long id) {
         friends.remove(id);
-    }
-
-    public List<Long> getFriends() {
-        return new ArrayList<>(friends);
     }
 }
