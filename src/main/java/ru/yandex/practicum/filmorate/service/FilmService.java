@@ -18,6 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService extends AbstractService<Film> {
     private static final LocalDate BIRTH_DATE_OF_CINEMA = LocalDate.of(1895, 12, 28);
+    public static final Comparator<Film> COMPARATOR = Comparator.comparing(Film::getPopularFilmsList).reversed();
     private final Storage<User> userStorage;
 
     @Autowired
@@ -36,10 +37,7 @@ public class FilmService extends AbstractService<Film> {
 
     public void addLike(long filmId, long userId) {
         Film film = storage.findObjectById(filmId);
-        if (film == null) {
-            log.warn(LogMessages.NULL_FILM.toString());
-            return;
-        }
+        checkIfObjectNull(film);
         userStorage.findObjectById(userId);
         film.addLike(userId);
         log.info(LogMessages.LIKED_FILM.toString(), film);
@@ -47,10 +45,7 @@ public class FilmService extends AbstractService<Film> {
 
     public void removeLike(long filmId, long userId) {
         Film film = storage.findObjectById(filmId);
-        if (film == null) {
-            log.warn(LogMessages.NULL_FILM.toString());
-            return;
-        }
+        checkIfObjectNull(film);
         userStorage.findObjectById(userId);
         film.removeLike(userId);
         log.info(LogMessages.UNLIKED_FILM.toString(), film);
@@ -59,7 +54,7 @@ public class FilmService extends AbstractService<Film> {
     public List<Film> getPopularFilmsList(int count) {
         log.info(LogMessages.POPULAR_TOTAL.toString(), count);
         return storage.getAllObjects().stream()
-                .sorted(Comparator.comparing(Film::getPopularFilmsList).reversed())
+                .sorted(COMPARATOR)
                 .limit(count)
                 .collect(Collectors.toList());
     }

@@ -30,17 +30,17 @@ public class Film extends AbstractObject {
     @Positive(message = AnnotationMessages.INCORRECT_DURATION)
     private int duration;
     @JsonIgnore
-    private final Set<Long> likes = new HashSet<>();
+    private final Set<Long> filmAudience = new HashSet<>();
 
     public void addLike(Long id) {
-        likes.add(id);
+        filmAudience.add(id);
     }
 
     public void removeLike(Long id) {
-        likes.remove(id);
+        filmAudience.remove(id);
     }
 
     public int getPopularFilmsList() {
-        return likes.size();
+        return filmAudience.size();
     }
 }

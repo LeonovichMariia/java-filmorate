@@ -24,58 +24,57 @@ public class UserController {
 
     @GetMapping
     public List<User> getAllUsers() {
-        log.info(LogMessages.GET_ALL_USERS.toString());
+        log.info(LogMessages.GET_ALL_USERS_REQUEST.toString());
         return userService.getAll();
     }
 
     @GetMapping("/{id}")
     public User getUserById(@PathVariable long id) {
-        log.info(LogMessages.GET_FRIEND_BY_ID.toString(), id);
+        log.info(LogMessages.GET_FRIEND_BY_ID_REQUEST.toString(), id);
         return userService.findObjectById(id);
     }
 
     @DeleteMapping("/{id}")
     public void deleteUserById(@PathVariable long id) {
-        log.info(LogMessages.DELETE_USER_BY_ID.toString(), id);
+        log.info(LogMessages.DELETE_USER_BY_ID_REQUEST.toString(), id);
         userService.deleteObjectById(id);
-        log.info(LogMessages.OBJECT_DELETED.toString(), id);
     }
 
     @PostMapping
     public User addUser(@Valid @RequestBody User user) throws ValidationException {
+        log.info(LogMessages.ADD_USER_REQUEST.toString(), user);
         userService.addObject(user);
-        log.info(LogMessages.OBJECT_ADD.toString(), user);
         return user;
     }
 
     @PutMapping
     public User userRenewal(@Valid @RequestBody User user) throws ValidationException {
+        log.info(LogMessages.RENEWAL_USER_REQUEST.toString(), user);
         userService.renewalObject(user);
-        log.info(LogMessages.OBJECT_UPDATE.toString(), user);
         return user;
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable long id, @PathVariable long friendId) {
-        log.info(LogMessages.ADD_FRIEND.toString(), id, friendId);
+        log.info(LogMessages.ADD_FRIEND_REQUEST.toString(), id, friendId);
         userService.addFriend(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable long id, @PathVariable long friendId) {
-        log.info(LogMessages.REMOVE_FRIEND.toString(), id, friendId);
+        log.info(LogMessages.REMOVE_FRIEND_REQUEST.toString(), id, friendId);
         userService.removeFriend(id, friendId);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable long id) {
-        log.info(LogMessages.GET_FRIENDS.toString());
+        log.info(LogMessages.GET_FRIENDS_REQUEST.toString());
         return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable long id, @PathVariable long otherId) {
-        log.info(LogMessages.GET_COMMON_FRIENDS.toString());
+        log.info(LogMessages.GET_COMMON_FRIENDS_REQUEST.toString());
         return userService.getCommonFriends(id, otherId);
     }
 }

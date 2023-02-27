@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
@@ -21,25 +20,19 @@ public class UserService extends AbstractService<User> {
     }
 
     @Override
-    public void validate(User user) throws ValidationException {
-        if (user != null) {
-            if (user.getName() == null || user.getName().isBlank()) {
-                log.warn(LogMessages.EMPTY_USER_NAME.toString());
-                user.setName(user.getLogin());
-            }
-        } else {
-            log.warn(LogMessages.NULL_USER.toString(), user);
+    public void validate(User user) {
+        checkIfObjectNull(user);
+        if (user.getName() == null || user.getName().isBlank()) {
+            log.warn(LogMessages.EMPTY_USER_NAME.toString());
+            user.setName(user.getLogin());
         }
     }
 
     public void addFriend(Long userId, Long friendId) {
         User user = storage.findObjectById(userId);
         User friend = storage.findObjectById(friendId);
-        if (user == null && friend == null) {
-            log.warn(LogMessages.NULL_USER.toString());
-            return;
-        }
-        assert user != null;
+        checkIfObjectNull(user);
+        checkIfObjectNull(friend);
         user.addFriend(friendId);
         friend.addFriend(userId);
         log.info(LogMessages.FRIEND_ADDED.toString(), friend);
@@ -48,11 +41,8 @@ public class UserService extends AbstractService<User> {
     public void removeFriend(Long userId, Long friendId) {
         User user = storage.findObjectById(userId);
         User friend = storage.findObjectById(friendId);
-        if (user == null && friend == null) {
-            log.warn(LogMessages.NULL_USER.toString());
-            return;
-        }
-        assert user != null;
+        checkIfObjectNull(user);
+        checkIfObjectNull(friend);
         user.removeFriend(friendId);
         friend.removeFriend(userId);
         log.info(LogMessages.FRIEND_REMOVED.toString(), friend);
@@ -60,22 +50,18 @@ public class UserService extends AbstractService<User> {
 
     public List<User> getFriends(Long userId) {
         User user = storage.findObjectById(userId);
-        if (user == null ) {
-            log.warn(LogMessages.NULL_USER.toString());
-            return null;
-        }
+        checkIfObjectNull(user);
         log.info(LogMessages.LIST_OF_FRIENDS.toString(), userId);
         return user.getFriends().stream()
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
-
     }
 
     public List<User> getCommonFriends(Long id, Long otherId) {
         User user = storage.findObjectById(id);
         User otherUser = storage.findObjectById(otherId);
         if (user == null && otherUser == null) {
-            log.warn(LogMessages.NULL_USER.toString());
+            log.warn(LogMessages.NULL_OBJECT.toString());
             return null;
         }
         log.info(LogMessages.LIST_OF_COMMON_FRIENDS.toString());
