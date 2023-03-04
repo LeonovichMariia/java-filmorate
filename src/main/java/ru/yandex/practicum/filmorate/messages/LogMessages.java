@@ -33,7 +33,10 @@ public enum LogMessages {
     GET_FRIENDS_REQUEST("Запрос на получение списка всех друзей"),
     LIST_OF_FRIENDS("Список всех друзей: "),
     GET_COMMON_FRIENDS_REQUEST("Запрос на получение списка общих друзей у пользователей {} {} "),
-    LIST_OF_COMMON_FRIENDS("Список общих друзей: "),;
+    LIST_OF_COMMON_FRIENDS("Список общих друзей: "),
+    BAD_REQUEST_STATUS("Ошибка 400!"),
+    NOT_FOUND_STATUS("Ошибка 404!"),
+    INTERNAL_SERVER_ERROR_STATUS("Ошибка 500!");
 
     private final String messageText;
 
