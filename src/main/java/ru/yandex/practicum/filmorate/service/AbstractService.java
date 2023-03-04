@@ -13,7 +13,8 @@ public abstract class AbstractService<T extends AbstractObject> {
     protected Storage<T> storage;
 
     protected abstract void validate(T object) throws ValidationException;
-    public void checkIfObjectNull(T object) {
+    
+    protected void checkIfObjectNull(T object) {
         if (object == null) {
             log.warn(LogMessages.NULL_OBJECT.toString());
         }
