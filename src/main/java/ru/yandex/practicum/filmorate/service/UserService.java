@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
+import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
 
@@ -28,14 +30,34 @@ public class UserService extends AbstractService<User> {
         }
     }
 
-    public void addFriend(Long userId, Long friendId) {
+    public void addFriend(Long userId, Long otherUserId) {
         User user = storage.findObjectById(userId);
-        User friend = storage.findObjectById(friendId);
+        User otherUser = storage.findObjectById(otherUserId);
         checkIfObjectNull(user);
-        checkIfObjectNull(friend);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        log.info(LogMessages.FRIEND_ADDED.toString(), friend);
+        checkIfObjectNull(otherUser);
+        User friend = getFriend(userId, otherUserId);
+        if (friend != null) {
+            Friend unconfirmedFriend = user.getFriends().stream()
+                    .filter(f -> f.getUserId() == otherUserId)
+                    .findFirst()
+                    .orElse(null);
+            Friend otherUnconfirmedFriend = user.getFriends().stream()
+                    .filter(f -> f.getUserId() == otherUserId)
+                    .findFirst()
+                    .orElse(null);
+            if(unconfirmedFriend == null || otherUnconfirmedFriend == null) {
+                log.warn(LogMessages.NULL_OBJECT.toString());
+                throw new ObjectNotFoundException("Неизвестный объект!");
+            } else {
+                unconfirmedFriend.setFriendshipConfirmed(true);
+                otherUnconfirmedFriend.setFriendshipConfirmed(true);
+                log.info(LogMessages.FRIEND_CONFIRMED.toString());
+            }
+        } else {
+            user.addFriend(otherUserId);
+            otherUser.addFriend(userId);
+            log.info(LogMessages.FRIEND_ADDED.toString(), otherUser);
+        }
     }
 
     public void removeFriend(Long userId, Long friendId) {
@@ -53,6 +75,7 @@ public class UserService extends AbstractService<User> {
         checkIfObjectNull(user);
         log.info(LogMessages.LIST_OF_FRIENDS.toString(), userId);
         return user.getFriends().stream()
+                .map(Friend::getUserId)
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
     }
@@ -65,7 +88,12 @@ public class UserService extends AbstractService<User> {
         log.info(LogMessages.LIST_OF_COMMON_FRIENDS.toString());
         return user.getFriends().stream()
                 .filter(otherUser.getFriends()::contains)
+                .map(Friend::getUserId)
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
+    }
+
+    public User getFriend(Long id, Long friendId) {
+        return getFriends(id).stream().filter(user -> user.getId() == friendId).findFirst().orElse(null);
     }
 }

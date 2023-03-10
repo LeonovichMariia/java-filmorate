@@ -36,13 +36,15 @@ public class User extends AbstractObject {
     @PastOrPresent(message = AnnotationMessages.INCORRECT_BIRTH_DATE)
     private LocalDate birthday;
     @JsonIgnore
-    private Set<Long> friends = new HashSet<>();
+    private final Set<Friend> friends = new HashSet<>();
 
     public void addFriend(Long id) {
-        friends.add(id);
+        Friend friend = new Friend();
+        friend.setUserId(id);
+        friends.add(friend);
     }
 
     public void removeFriend(Long id) {
-        friends.remove(id);
+        friends.removeIf(friend -> friend.getUserId() == id);
     }
 }
