@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 
@@ -45,7 +47,12 @@ public class FilmDbStorage implements FilmStorage {
                 "INNER JOIN films ON fg.film_id = films.FILM_ID \n" +
                 "WHERE films.film_id = ?;";
         List<Genre> genres = jdbcTemplate.query(genresSql, new GenresMapper(), id);
-        film.setGenres(genres);
+        if (film != null) {
+            film.setGenres(genres);
+        } else {
+            log.warn(LogMessages.NULL_OBJECT.toString());
+            throw new ObjectNotFoundException("Неизвестный объект!");
+        }
         return film;
     }
 
