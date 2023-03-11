@@ -1,19 +1,21 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
 
 @Slf4j
 @Repository
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "db")
 public class FilmDbStorage implements FilmStorage {
-    public FilmDbStorage (){
-        log.debug("Работаем в базе данных");
-    }
+    private final JdbcTemplate jdbcTemplate;
 
     @Override
     public Film addObject(Film object) {
@@ -32,7 +34,19 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findObjectById(long id) {
-        return null;
+        String sql = "SELECT * \n" +
+                "FROM films\n" +
+                "INNER JOIN mpa ON films.mpa_id = mpa.mpa_id\n" +
+                "WHERE films.film_id = ?;";
+        Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
+        String genresSql = "SELECT *\n" +
+                "FROM genres\n" +
+                "INNER JOIN film_genre AS fg ON films.film_id = fg.film_id\n" +
+                "INNER JOIN films ON fg.film_id = films.FILM_ID \n" +
+                "WHERE films.film_id = ?;";
+        List<Genre> genres = jdbcTemplate.query(genresSql, new GenresMapper(), id);
+        film.setGenres(genres);
+        return film;
     }
 
     @Override

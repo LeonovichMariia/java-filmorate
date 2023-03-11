@@ -8,9 +8,8 @@ import ru.yandex.practicum.filmorate.storage.AbstractStorage;
 
 @Slf4j
 @Component
-@ConditionalOnProperty(name = "app.storage.type", havingValue = "memory")
+//@ConditionalOnProperty(name = "app.storage.type", havingValue = "memory")
 public class InMemoryUserStorage extends AbstractStorage<User> implements UserStorage {
     public InMemoryUserStorage(){
-        log.debug("Работаем в памяти");
     }
 }

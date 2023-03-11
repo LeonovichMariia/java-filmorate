@@ -37,6 +37,7 @@ public class UserService extends AbstractService<User> {
         checkIfObjectNull(otherUser);
         User friend = getFriend(userId, otherUserId);
         if (friend != null) {
+            log.info(LogMessages.FRIEND_UNCONFIRMED.toString());
             Friend unconfirmedFriend = user.getFriends().stream()
                     .filter(f -> f.getUserId() == otherUserId)
                     .findFirst()

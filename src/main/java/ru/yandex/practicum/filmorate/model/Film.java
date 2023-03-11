@@ -19,12 +19,14 @@ import java.util.Set;
 @EqualsAndHashCode(callSuper = true)
 public class Film extends AbstractObject {
     @Builder
-    public Film(long id, String name, String description, LocalDate releaseDate, int duration) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genre, Mpa mpa) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+        this.genres = genre;
+        this.mpa = mpa;
     }
 
     @NotBlank(message = AnnotationMessages.EMPTY_NAME)
