@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
@@ -22,8 +23,9 @@ public class FilmService extends AbstractService<Film> {
     private final Storage<User> userStorage;
 
     @Autowired
-    public FilmService(Storage<Film> storage, Storage<User> userStorage) {
-        this.storage = storage;
+    public FilmService(Storage<Film> filmStorage, Storage<User> userStorage) {
+        log.info(filmStorage.getClass().toString());
+        this.storage = filmStorage;
         this.userStorage = userStorage;
     }
 
