@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.storage.genre.GenreMapper;
 
 import java.util.List;
 
@@ -37,16 +38,16 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public Film findObjectById(long id) {
         String sql = "SELECT * \n" +
-                "FROM films\n" +
-                "INNER JOIN mpa ON films.mpa_id = mpa.mpa_id\n" +
-                "WHERE films.film_id = ?;";
+                "FROM film_data\n" +
+                "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id\n" +
+                "WHERE film_data.film_id = ?;";
         Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
         String genresSql = "SELECT *\n" +
-                "FROM genres\n" +
-                "INNER JOIN film_genre AS fg ON films.film_id = fg.film_id\n" +
-                "INNER JOIN films ON fg.film_id = films.FILM_ID \n" +
-                "WHERE films.film_id = ?;";
-        List<Genre> genres = jdbcTemplate.query(genresSql, new GenresMapper(), id);
+                "FROM genre\n" +
+                "INNER JOIN film_genre AS fg ON film_data.film_id = fg.film_id\n" +
+                "INNER JOIN film_data ON fg.film_id = film_data.film_id \n" +
+                "WHERE film_data.film_id = ?;";
+        List<Genre> genres = jdbcTemplate.query(genresSql, new GenreMapper(), id);
         if (film != null) {
             film.setGenres(genres);
         } else {
@@ -58,6 +59,7 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllObjects() {
-        return null;
+        String sql = "SELECT * FROM film_data INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id INNER JOIN film_genre AS fg ON film_data.film_id = fg.film_id INNER JOIN film_data ON fg.film_id = film_data.film_id;";
+        return jdbcTemplate.query(sql, new FilmMapper());
     }
 }
