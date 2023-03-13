@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
@@ -19,7 +18,7 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService extends AbstractService<Film> {
     private static final LocalDate BIRTH_DATE_OF_CINEMA = LocalDate.of(1895, 12, 28);
-    public static final Comparator<Film> COMPARATOR = Comparator.comparing(Film::getPopularFilmsList).reversed();
+    public static final Comparator<Film> COMPARATOR = Comparator.comparing(Film::getRate).reversed();
     private final Storage<User> userStorage;
 
     @Autowired

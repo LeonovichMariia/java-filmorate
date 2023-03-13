@@ -51,9 +51,15 @@ public class FilmDbStorage implements FilmStorage {
     public Film renewalObject(Film object) {
         String sql = "UPDATE film_data SET name = ?, description = ?, release_date = ?, " +
                 "duration = ?, rate = ?, mpa_id = ? where film_id = ?";
-        int filmData = jdbcTemplate.update(sql, object.getName(), object.getDescription(), object.getReleaseDate(),
-                object.getDuration(), object.getRate(), object.getMpa().getId(), object.getId());
-        if(filmData == 0) {
+        int filmData = jdbcTemplate.update(sql,
+                object.getName(),
+                object.getDescription(),
+                object.getReleaseDate(),
+                object.getDuration(),
+                object.getRate(),
+                object.getMpa().getId(),
+                object.getId());
+        if (filmData == 0) {
             log.warn(LogMessages.OBJECT_NOT_FOUND.toString());
             throw new ObjectNotFoundException(LogMessages.OBJECT_NOT_FOUND.toString());
         }
@@ -80,7 +86,7 @@ public class FilmDbStorage implements FilmStorage {
                 "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id\n" +
                 "WHERE film_data.film_id = ?;";
         Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
-        String genreSql= "SELECT *\n" +
+        String genreSql = "SELECT *\n" +
                 "FROM genre\n" +
                 "INNER JOIN film_genre AS fg ON film_data.film_id = fg.film_id\n" +
                 "INNER JOIN film_data ON fg.film_id = film_data.film_id \n" +
