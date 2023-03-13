@@ -4,15 +4,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
-import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.storage.film.FilmMapper;
-import ru.yandex.practicum.filmorate.storage.genre.GenreMapper;
 
+import java.sql.Date;
+import java.sql.PreparedStatement;
 import java.util.List;
 
 @Slf4j
@@ -21,19 +20,43 @@ import java.util.List;
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "db")
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
+
     @Override
     public User addObject(User object) {
-        return null;
+        String sql = "INSERT INTO user_data (email, login, name, birthday) \n" +
+                "VALUES (?, ?, ?, ?)";
+        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            PreparedStatement psst = connection.prepareStatement(sql, new String[]{"user_id"});
+            psst.setString(1, object.getEmail());
+            psst.setString(2, object.getLogin());
+            psst.setString(3, object.getName());
+            psst.setDate(4, Date.valueOf(object.getBirthday()));
+            return psst;
+        }, keyHolder);
+        object.setId(keyHolder.getKey().longValue());
+        log.info(LogMessages.OBJECT_ADDED.toString(), object);
+        return object;
     }
 
     @Override
     public User renewalObject(User object) {
-        return null;
+        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
+        int userData = jdbcTemplate.update(sql, object.getEmail(), object.getLogin(), object.getName(),
+                object.getBirthday(), object.getId());
+        if (userData == 0) {
+            log.warn(LogMessages.OBJECT_NOT_FOUND.toString());
+            throw new ObjectNotFoundException(LogMessages.OBJECT_NOT_FOUND.toString());
+        }
+        return object;
     }
 
     @Override
     public void deleteObject(long id) {
-
+        String sql = "DELETE FROM friend \n" +
+                "WHERE user_id = ?\n" +
+                "AND friend_id = ? ";
+        jdbcTemplate.update(sql, id, id);
     }
 
     @Override
@@ -41,8 +64,7 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT * \n" +
                 "FROM user_data\n" +
                 "WHERE user_data.user_id = ?;";
-        User user = jdbcTemplate.queryForObject(sql, new UserMapper(), id);
-        return user;
+        return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
     }
 
     @Override

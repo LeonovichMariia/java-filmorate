@@ -17,13 +17,14 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = true)
 public class Film extends AbstractObject {
     @Builder
-    public Film(long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genre, Mpa mpa) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genre, long rate, Mpa mpa) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.genres = genre;
+        this.rate = rate;
         this.mpa = mpa;
     }
 
@@ -40,13 +41,16 @@ public class Film extends AbstractObject {
     @NotNull
     private Mpa mpa;
     private List<Genre> genres;
+    private Long rate = 0L;
 
     public void addLike(Long id) {
         filmAudience.add(id);
+        rate++;
     }
 
     public void removeLike(Long id) {
         filmAudience.remove(id);
+        rate--;
     }
 
     public int getPopularFilmsList() {

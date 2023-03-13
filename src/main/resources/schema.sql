@@ -14,6 +14,7 @@ name varchar(300) NOT NULL UNIQUE,
 description varchar(200)  DEFAULT 'не указано',
 release_date DATE NOT NULL,
 duration INTEGER NOT NULL,
+rate long,
 mpa_id int
 );
 

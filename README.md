@@ -29,7 +29,8 @@ https://dbdiagram.io/d/64065de2296d97641d85e022
 - ***name*** - название фильма  
 - ***description*** - описание фильма  
 - ***release_date*** - дата выхода фильма  
-- ***duration*** - продолжительность фильма  
+- ***duration*** - продолжительность фильма 
+- ***rate*** - количество поставленных лайков
 - ***mpa_id*** - идетификатор рейтинга фильма 
 
 #### Таблица friend:
@@ -58,31 +59,31 @@ https://dbdiagram.io/d/64065de2296d97641d85e022
 
 #### 1. Создание пользователя:
 ```
-INSERT INTO users (email, login, name, birthday)
+INSERT INTO user_data (email, login, name, birthday)
 VALUES ( ?, ?, ?, ? );
 ```
 
 #### 2. Получение списка всех фильмов/пользователей:
 ```
 SELECT *
-FROM films/users;
+FROM film_data/user_data;
 ```
 
 #### 3. Получение информации о пользователе по его id
 ```
 SELECT *
-FROM users
+FROM user_data
 WHERE user_id = ?
 ```
 
 #### 4. Добавление в друзья
 ```
-INSERT INTO friends(user_id, friend_id) VALUES (?, ?)
+INSERT INTO friend(user_id, friend_id) VALUES (?, ?)
 ```
 
 #### 5. Удаление из друзей
 ```
 DELETE
-FROM friends
+FROM friend
 WHERE user_id = ? AND friend_id = ?
 ```
