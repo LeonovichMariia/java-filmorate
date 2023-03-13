@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Mpa;
-import ru.yandex.practicum.filmorate.storage.genre.GenreMapper;
 
 import java.util.List;
 
@@ -22,6 +22,10 @@ public class MpaDbStorage implements MpaStorage {
     public Mpa getMpaById(long id) {
         String sql = "SELECT * FROM mpa WHERE mpa_id = ?";
         Mpa mpa = jdbcTemplate.queryForObject(sql, new MpaMapper(), id);
+        if (mpa == null) {
+            log.warn(LogMessages.NULL_OBJECT.toString());
+            throw new ObjectNotFoundException("Неизвестный рейтинг");
+        }
         return mpa;
     }
 

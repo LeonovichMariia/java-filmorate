@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.util.List;
@@ -20,6 +22,10 @@ public class GenreDbStorage implements GenreStorage {
     public Genre getGenreById(long id) {
         String sql = "SELECT * FROM genre WHERE genre_id = ?";
         Genre genre = jdbcTemplate.queryForObject(sql, new GenreMapper(), id);
+        if (genre == null) {
+            log.warn(LogMessages.NULL_OBJECT.toString());
+            throw new ObjectNotFoundException("Неизвестный жанр");
+        }
         return genre;
     }
 

@@ -18,7 +18,7 @@ public abstract class AbstractService<T extends AbstractObject> {
     protected void checkIfObjectNull(T object) {
         if (object == null) {
             log.warn(LogMessages.NULL_OBJECT.toString());
-            throw new ObjectNotFoundException("Неизвестный объект!");
+            throw new ObjectNotFoundException(LogMessages.NULL_OBJECT.toString());
         }
     }
 
