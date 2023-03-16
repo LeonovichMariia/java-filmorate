@@ -3,11 +3,13 @@ package ru.yandex.practicum.filmorate.storage.mpa;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.mappers.MpaMapper;
 
 import java.util.List;
 
@@ -20,18 +22,18 @@ public class MpaDbStorage implements MpaStorage {
 
     @Override
     public Mpa getMpaById(long id) {
-        String sql = "SELECT * FROM mpa WHERE mpa_id = ?";
-        Mpa mpa = jdbcTemplate.queryForObject(sql, new MpaMapper(), id);
-        if (mpa == null) {
-            log.warn(LogMessages.NULL_OBJECT.toString());
-            throw new ObjectNotFoundException("Неизвестный рейтинг");
+        String sql = "SELECT * FROM mpa WHERE mpa_id = ? ORDER BY mpa_id";
+        try {
+            return jdbcTemplate.queryForObject(sql, new MpaMapper(), id);
+        } catch (EmptyResultDataAccessException ex) {
+            log.warn(LogMessages.OBJECT_NOT_FOUND.toString(), id);
+            throw new ObjectNotFoundException(LogMessages.OBJECT_NOT_FOUND.toString());
         }
-        return mpa;
     }
 
     @Override
     public List<Mpa> getAllMpas() {
-        String sql = "SELECT * FROM mpa";
+        String sql = "SELECT * FROM mpa ORDER BY mpa_id";
         return jdbcTemplate.query(sql, new MpaMapper());
     }
 }

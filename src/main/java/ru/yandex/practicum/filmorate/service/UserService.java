@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
+import ru.yandex.practicum.filmorate.storage.user.FriendStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -15,10 +17,12 @@ import java.util.stream.Collectors;
 @Slf4j
 @Service
 public class UserService extends AbstractService<User> {
+    private FriendStorage friendStorage;
 
     @Autowired
-    public UserService(Storage<User> storage) {
+    public UserService(Storage<User> storage, FriendStorage friendStorage) {
         this.storage = storage;
+        this.friendStorage = friendStorage;
     }
 
     @Override
@@ -57,6 +61,7 @@ public class UserService extends AbstractService<User> {
         } else {
             user.addFriend(otherUserId);
             otherUser.addFriend(userId);
+            friendStorage.addFriend(userId, otherUserId);
             log.info(LogMessages.FRIEND_ADDED.toString(), otherUser);
         }
     }
@@ -68,6 +73,7 @@ public class UserService extends AbstractService<User> {
         checkIfObjectNull(friend);
         user.removeFriend(friendId);
         friend.removeFriend(userId);
+        friendStorage.removeFriend(userId, friendId);
         log.info(LogMessages.FRIEND_REMOVED.toString(), friend);
     }
 
@@ -75,10 +81,7 @@ public class UserService extends AbstractService<User> {
         User user = storage.findObjectById(userId);
         checkIfObjectNull(user);
         log.info(LogMessages.LIST_OF_FRIENDS.toString(), userId);
-        return user.getFriends().stream()
-                .map(Friend::getUserId)
-                .map(storage::findObjectById)
-                .collect(Collectors.toList());
+        return friendStorage.getFriends(userId);
     }
 
     public List<User> getCommonFriends(Long id, Long otherId) {
@@ -87,11 +90,7 @@ public class UserService extends AbstractService<User> {
         checkIfObjectNull(user);
         checkIfObjectNull(otherUser);
         log.info(LogMessages.LIST_OF_COMMON_FRIENDS.toString());
-        return user.getFriends().stream()
-                .filter(otherUser.getFriends()::contains)
-                .map(Friend::getUserId)
-                .map(storage::findObjectById)
-                .collect(Collectors.toList());
+        return friendStorage.getCommonFriends(id, otherId);
     }
 
     public User getFriend(Long id, Long friendId) {

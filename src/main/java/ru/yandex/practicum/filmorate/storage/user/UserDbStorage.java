@@ -3,12 +3,16 @@ package ru.yandex.practicum.filmorate.storage.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mappers.UserMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
@@ -41,7 +45,7 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User renewalObject(User object) {
-        String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
+        String sql = "UPDATE user_data SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
         int userData = jdbcTemplate.update(sql, object.getEmail(), object.getLogin(), object.getName(),
                 object.getBirthday(), object.getId());
         if (userData == 0) {
@@ -60,11 +64,17 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
+    @Nullable
     public User findObjectById(long id) {
         String sql = "SELECT * \n" +
                 "FROM user_data\n" +
                 "WHERE user_data.user_id = ?;";
-        return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+        try {
+            return jdbcTemplate.queryForObject(sql, new UserMapper(), id);
+        } catch (EmptyResultDataAccessException ex) {
+            log.warn(LogMessages.OBJECT_NOT_FOUND.toString(), id);
+            throw new ObjectNotFoundException(LogMessages.OBJECT_NOT_FOUND.toString());
+        }
     }
 
     @Override

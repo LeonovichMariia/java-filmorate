@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.user;
+package ru.yandex.practicum.filmorate.storage.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.User;
@@ -15,6 +15,7 @@ public class UserMapper implements RowMapper<User> {
                 .name(rs.getString("name"))
                 .login(rs.getString("login"))
                 .birthday(rs.getDate("birthday").toLocalDate())
+
                 .build();
     }
 }

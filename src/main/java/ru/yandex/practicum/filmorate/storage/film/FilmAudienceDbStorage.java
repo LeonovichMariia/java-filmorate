@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.mappers.FilmMapper;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public class FilmAudienceDbStorage implements FilmAudienceStorage {
 
     @Override
     public List<Film> getPopularFilmsList(int count) {
-        String sql = "SELECT film_data.* \n" +
+        String sql = "SELECT film_data.*, mpa_name\n" +
                 "FROM film_data\n" +
                 "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id\n" +
                 "WHERE film_data.mpa_id = mpa.mpa_id \n" +

@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.storage.film;
+package ru.yandex.practicum.filmorate.storage.mappers;
 
 import org.springframework.jdbc.core.RowMapper;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -20,8 +20,8 @@ public class FilmMapper implements RowMapper<Film> {
                 .rate(rs.getLong("rate"))
                 .mpa(
                         Mpa.builder()
-                                .id(rs.getInt("mpa_id"))
-                                .name(rs.getString("name"))
+                                .id(rs.getLong("mpa_id"))
+                                .name(rs.getString("mpa_name"))
                                 .build()
                 )
                 .build();

@@ -17,13 +17,12 @@ import java.util.*;
 @EqualsAndHashCode(callSuper = true)
 public class Film extends AbstractObject {
     @Builder
-    public Film(long id, String name, String description, LocalDate releaseDate, int duration, List<Genre> genre, long rate, Mpa mpa) {
+    public Film(long id, String name, String description, LocalDate releaseDate, int duration, long rate, Mpa mpa) {
         super(id);
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
-        this.genres = genre;
         this.rate = rate;
         this.mpa = mpa;
     }
@@ -40,7 +39,7 @@ public class Film extends AbstractObject {
     private final Set<Long> filmAudience = new HashSet<>();
     @NotNull
     private Mpa mpa;
-    private List<Genre> genres;
+    private Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
     private Long rate = 0L;
 
     public void addLike(Long id) {

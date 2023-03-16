@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.mappers.UserMapper;
 
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class FriendDbStorage implements FriendStorage {
     public List<User> getCommonFriends(Long id, Long otherId) {
         String sqlQuery = "SELECT * \n" +
                 "FROM user_data AS u, friend AS f, friend AS fr \n" +
-                "WHERE  u.user_id = f.friend_id AND u.user_id = fr.friend_id \n" +
+                "WHERE u.user_id = f.friend_id AND u.user_id = fr.friend_id \n" +
                 "AND f.user_id = ? AND fr.user_id = ?";
         return jdbcTemplate.query(sqlQuery, new UserMapper(), id, otherId);
     }

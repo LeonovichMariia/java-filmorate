@@ -10,7 +10,9 @@ import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.GenreService;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -20,13 +22,13 @@ public class GenreController {
     private final GenreService service;
 
     @GetMapping
-    public List<Genre> getAllGenres() {
+    public Collection<Genre> getAllGenres() {
         log.info(LogMessages.GET_GENRE_REQUEST.toString());
         return service.getAllGenres();
     }
 
     @GetMapping("/{id}")
-    public Genre getGenreById(@PathVariable int id) {
+    public Genre getGenreById(@PathVariable long id) {
         log.info(LogMessages.GET_GENRE_BY_ID_REQUEST.toString());
         return service.getGenreById(id);
     }
