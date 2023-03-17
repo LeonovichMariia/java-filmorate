@@ -13,12 +13,15 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.util.List;
+import java.util.*;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -348,5 +351,63 @@ class FilmControllerTest {
         mockMvc.perform(
                         get("/films/popular")).andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    public void addFilmAndDelete() throws Exception {
+        Film film1 = Film.builder()
+                .name("Titanic")
+                .description("Titanic description")
+                .releaseDate(LocalDate.of(2012, 6, 30))
+                .duration(60)
+                .rate(0)
+                .mpa(new Mpa(2, "PG"))
+                .build();
+        mockMvc.perform(
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film1))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/films")).andDo(print())
+                .andExpect(status().isOk());
+        film1.setId(1L);
+        mockMvc.perform(
+                        delete("/films/1"))
+                .andDo(print())
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/films")).andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void filmGenreUpdate() throws Exception {
+        Film film1 = Film.builder()
+                .name("Titanic")
+                .description("Titanic description")
+                .releaseDate(LocalDate.of(2012, 6, 30))
+                .duration(60)
+                .rate(0)
+                .mpa(new Mpa(2, "PG"))
+                .build();
+        mockMvc.perform(
+                        post("/films")
+                                .content(objectMapper.writeValueAsString(film1))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
+        film1.setId(1L);
+        film1.getGenres().add(new Genre(5, "Документальный"));
+        LinkedHashSet<Genre> expectedSetGenre = new LinkedHashSet<>();
+        expectedSetGenre.add(new Genre(5, "Документальный"));
+        mockMvc.perform(
+                        put("/films")
+                                .content(objectMapper.writeValueAsString(film1))
+                                .contentType(MediaType.APPLICATION_JSON)).andDo(print())
+                .andExpectAll(
+                        status().isOk(),
+                        result -> assertEquals(expectedSetGenre, objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8),
+                                Film.class).getGenres(), "Фильмы не совпадают")
+                );
     }
 }

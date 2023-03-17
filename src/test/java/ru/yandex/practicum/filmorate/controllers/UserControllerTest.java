@@ -327,4 +327,29 @@ class UserControllerTest {
                         }).size())
                 );
     }
+
+    @Test
+    public void addUserAndDelete() throws Exception {
+        User user = User.builder()
+                .email("name@email.com")
+                .login("Name1234")
+                .name("Name")
+                .birthday(LocalDate.of(1994, 6, 19))
+                .build();
+        mockMvc.perform(
+                        post("/users")
+                                .content(objectMapper.writeValueAsString(user))
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/users")).andDo(print())
+                .andExpect(status().isOk());
+        user.setId(1L);
+        mockMvc.perform(
+                delete("/users/1"))
+                        .andDo(print())
+                        .andExpect(status().isOk());
+        mockMvc.perform(get("/users")).andDo(print())
+                .andExpect(status().isOk());
+    }
 }
