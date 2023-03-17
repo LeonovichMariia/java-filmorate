@@ -59,8 +59,6 @@ public class UserService extends AbstractService<User> {
                 log.info(LogMessages.FRIEND_CONFIRMED.toString());
             }
         } else {
-            user.addFriend(otherUserId);
-            otherUser.addFriend(userId);
             friendStorage.addFriend(userId, otherUserId);
             log.info(LogMessages.FRIEND_ADDED.toString(), otherUser);
         }
@@ -71,8 +69,6 @@ public class UserService extends AbstractService<User> {
         User friend = storage.findObjectById(friendId);
         checkIfObjectNull(user);
         checkIfObjectNull(friend);
-        user.removeFriend(friendId);
-        friend.removeFriend(userId);
         friendStorage.removeFriend(userId, friendId);
         log.info(LogMessages.FRIEND_REMOVED.toString(), friend);
     }

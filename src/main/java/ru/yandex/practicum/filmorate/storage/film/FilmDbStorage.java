@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.mappers.GenreMapper;
 
@@ -21,7 +20,7 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -89,12 +88,10 @@ public class FilmDbStorage implements FilmStorage {
                     "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id\n" +
                     "WHERE film_data.film_id = ?";
             Film film = jdbcTemplate.queryForObject(sql, new FilmMapper(), id);
-            String genreSql = "SELECT *\n" +
-                    "FROM genre\n" +
-                    "INNER JOIN film_genre AS fg ON film_data.film_id = fg.film_id\n" +
-                    "INNER JOIN film_data ON fg.film_id = film_data.film_id \n" +
-                    "WHERE film_data.film_id = ?";
-            Set<Genre> genre = new HashSet<>(jdbcTemplate.query(genreSql, new GenreMapper(), id));
+
+            String sqlGetGenresForFilm = "SELECT * FROM film_genre INNER JOIN genre ON film_genre.genre_id=genre.genre_id WHERE film_id=?";
+
+            LinkedHashSet<Genre> genre = new LinkedHashSet<>(jdbcTemplate.query(sqlGetGenresForFilm, new GenreMapper(), id));
             if (film != null) {
                 film.setGenres(genre);
             } else {
@@ -109,11 +106,21 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAllObjects() {
-        String sql = "SELECT film_data.*, mpa.mpa_name \n" +
+        String getFilmSql = "SELECT film_data.*, mpa.mpa_name \n" +
                 "FROM film_data, mpa\n" +
                 "WHERE film_data.mpa_id = mpa.mpa_id\n" +
                 "ORDER BY film_data.film_id";
-        return jdbcTemplate.query(sql, new FilmMapper());
+
+        List<Film> films = jdbcTemplate.query(getFilmSql, new FilmMapper());
+
+        String sqlGetGenresForFilm = "SELECT * FROM film_genre INNER JOIN genre ON film_genre.genre_id=genre.genre_id WHERE film_id=?";
+
+        for (Film film : films) {
+            List<Genre> genres = jdbcTemplate.query(sqlGetGenresForFilm, new GenreMapper(), film.getId());
+            film.setGenres(new LinkedHashSet<>(genres));
+        }
+
+        return films;
     }
 
     private void saveGenresToFilm(Film film) {
@@ -126,17 +133,17 @@ public class FilmDbStorage implements FilmStorage {
         List<Genre> genreList = new ArrayList<>(genres);
         jdbcTemplate.batchUpdate(
                 "INSERT INTO film_genre (film_id, genre_id) VALUES (?, ?)",
-                    new BatchPreparedStatementSetter() {
-                        @Override
-                        public void setValues(PreparedStatement ps, int i) throws SQLException {
-                            ps.setLong(1, filmId);
-                            ps.setLong(2, genreList.get(i).getId());
-                        }
+                new BatchPreparedStatementSetter() {
+                    @Override
+                    public void setValues(PreparedStatement ps, int i) throws SQLException {
+                        ps.setLong(1, filmId);
+                        ps.setLong(2, genreList.get(i).getId());
+                    }
 
-                        @Override
-                        public int getBatchSize() {
-                            return genreList.size();
-                        }
-                    });
+                    @Override
+                    public int getBatchSize() {
+                        return genreList.size();
+                    }
+                });
     }
 }

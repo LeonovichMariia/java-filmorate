@@ -39,7 +39,7 @@ public class Film extends AbstractObject {
     private final Set<Long> filmAudience = new HashSet<>();
     @NotNull
     private Mpa mpa;
-    private Set<Genre> genres = new TreeSet<>(Comparator.comparing(Genre::getId));
+    private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
     private Long rate = 0L;
 
     public void addLike(Long id) {
@@ -50,13 +50,5 @@ public class Film extends AbstractObject {
     public void removeLike(Long id) {
         filmAudience.remove(id);
         rate--;
-    }
-
-    public int getPopularFilmsList() {
-        return filmAudience.size();
-    }
-
-    public void addGenre(Genre genre) {
-        genres.add(genre);
     }
 }

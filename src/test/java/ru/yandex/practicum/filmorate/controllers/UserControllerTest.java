@@ -206,7 +206,6 @@ class UserControllerTest {
                                 .getContentAsString(), new TypeReference<ArrayList<User>>() {
                         }))
                 );
-
     }
 
     @Test

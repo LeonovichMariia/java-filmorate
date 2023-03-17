@@ -35,11 +35,10 @@ public class FilmAudienceDbStorage implements FilmAudienceStorage {
 
     @Override
     public List<Film> getPopularFilmsList(int count) {
-        String sql = "SELECT film_data.*, mpa_name\n" +
-                "FROM film_data\n" +
-                "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id\n" +
-                "WHERE film_data.mpa_id = mpa.mpa_id \n" +
-                "ORDER BY rate \n" +
+        String sql = "SELECT film_data.*, mpa_name FROM film_data " +
+                "INNER JOIN mpa ON film_data.mpa_id = mpa.mpa_id " +
+                "WHERE film_data.mpa_id = mpa.mpa_id " +
+                "ORDER BY rate DESC, FILM_DATA.FILM_ID DESC " +
                 "LIMIT ?";
         return jdbcTemplate.query(sql, new FilmMapper(), count);
     }

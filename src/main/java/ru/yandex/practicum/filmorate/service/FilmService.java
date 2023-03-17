@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @Service
 public class FilmService extends AbstractService<Film> {
     private static final LocalDate BIRTH_DATE_OF_CINEMA = LocalDate.of(1895, 12, 28);
-    public static final Comparator<Film> COMPARATOR = Comparator.comparing(Film::getRate).reversed();
     private final Storage<User> userStorage;
     private final FilmAudienceStorage filmAudienceStorage;
 
@@ -55,7 +54,6 @@ public class FilmService extends AbstractService<Film> {
         Film film = storage.findObjectById(filmId);
         checkIfObjectNull(film);
         userStorage.findObjectById(userId);
-        film.removeLike(userId);
         filmAudienceStorage.removeLike(filmId, userId);
         log.info(LogMessages.UNLIKED_FILM.toString(), film);
     }

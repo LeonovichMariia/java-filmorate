@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 public class User extends AbstractObject {
     @Builder
     public User(Long id, String email, String login, String name, LocalDate birthday) {
