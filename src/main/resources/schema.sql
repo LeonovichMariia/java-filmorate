@@ -15,14 +15,14 @@ description varchar(200)  DEFAULT 'не указано',
 release_date DATE NOT NULL,
 duration INTEGER NOT NULL,
 rate long,
-mpa_id int
+mpa_id long
 );
 
 CREATE TABLE IF NOT EXISTS friend(
 user_id int,
 friend_id int,
 friendship_status boolean DEFAULT false,
-CONSTRAINT friends_pk PRIMARY KEY (user_id, friend_id)
+PRIMARY KEY (user_id, friend_id)
 );
 
 CREATE TABLE IF NOT EXISTS mpa(
@@ -33,13 +33,13 @@ mpa_name varchar(300) NOT NULL UNIQUE
 CREATE TABLE IF NOT EXISTS film_audience(
 user_id INTEGER,
 film_id INTEGER,
-CONSTRAINT likes_pk PRIMARY KEY (user_id, film_id)
+PRIMARY KEY (user_id, film_id)
 );
 
 CREATE TABLE IF NOT EXISTS film_genre(
 film_id INTEGER,
 genre_id INTEGER,
-CONSTRAINT film_genre_pk PRIMARY KEY (film_id, genre_id)
+PRIMARY KEY (film_id, genre_id)
 );
 
 CREATE TABLE IF NOT EXISTS genre(

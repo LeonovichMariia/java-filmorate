@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -7,21 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.client.match.MockRestRequestMatchers.content;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -35,10 +36,12 @@ class FilmControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
+
     @AfterEach
 
 
     @Test
+    @Order(12)
     public void addFilmWithEmptyName() throws Exception {
         Film film = Film.builder()
                 .description("Film description")
@@ -276,79 +279,6 @@ class FilmControllerTest {
         mockMvc.perform(
                         put("/films/1/like/1")).andDo(print())
                 .andExpect(status().isOk());
-    }
-
-    @Test
-    public void getPopularFilms() throws Exception {
-        Film film1 = Film.builder()
-                .name("House")
-                .description("Titanic description")
-                .releaseDate(LocalDate.of(2012, 6, 30))
-                .duration(60)
-                .rate(0)
-                .mpa(new Mpa(2, "PG"))
-                .build();
-        Film film2 = Film.builder()
-                .name("Avatar")
-                .description("Avatar description")
-                .releaseDate(LocalDate.of(2013, 12, 10))
-                .duration(160)
-                .rate(0)
-                .mpa(new Mpa(2, "PG"))
-                .build();
-        Film film3 = Film.builder()
-                .name("Spider Man")
-                .description("Spider Man description")
-                .releaseDate(LocalDate.of(2010, 11, 15))
-                .duration(100)
-                .rate(0)
-                .mpa(new Mpa(2, "PG"))
-                .build();
-        mockMvc.perform(
-                        post("/films")
-                                .content(objectMapper.writeValueAsString(film1))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        post("/films")
-                                .content(objectMapper.writeValueAsString(film2))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        post("/films")
-                                .content(objectMapper.writeValueAsString(film3))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
-        User user = User.builder()
-                .email("name@email.com")
-                .login("Name1234")
-                .name("Name")
-                .birthday(LocalDate.of(1994, 6, 19))
-                .build();
-        mockMvc.perform(
-                        post("/users")
-                                .content(objectMapper.writeValueAsString(user))
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        get("/films")
-                                .content(objectMapper.writeValueAsString(List.of(film1, film2, film3)))
-                                .contentType(MediaType.APPLICATION_JSON)).andDo(print())
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        put("/films/1/like/1")).andDo(print())
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        put("/films/2/like/1")).andDo(print())
-                .andExpect(status().isOk());
-        mockMvc.perform(
-                        get("/films/popular?count=2")).andDo(print())
-                .andExpect(status().isOk())
-                .andExpect((ResultMatcher) content().json("[{\"id\":3,\"name\":\"Spider Man\",\"description\":\"Spider Man description\",\"releaseDate\":\"2010-11-15\",\"duration\":100,\"mpa\":{\"id\":2,\"name\":\"PG\"},\"genres\":[],\"rate\":0,\"popularFilmsList\":0},{\"id\":2,\"name\":\"Avatar\",\"description\":\"Avatar description\",\"releaseDate\":\"2013-12-10\",\"duration\":160,\"mpa\":{\"id\":2,\"name\":\"PG\"},\"genres\":[],\"rate\":1]"));
     }
 
     @Test

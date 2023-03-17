@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode
 public class Mpa extends AbstractObject{
     private String name;
 

@@ -5,8 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
@@ -29,7 +29,7 @@ public class UserDbStorage implements UserStorage {
     public User addObject(User object) {
         String sql = "INSERT INTO user_data (email, login, name, birthday) \n" +
                 "VALUES (?, ?, ?, ?)";
-        GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
             PreparedStatement psst = connection.prepareStatement(sql, new String[]{"user_id"});
             psst.setString(1, object.getEmail());

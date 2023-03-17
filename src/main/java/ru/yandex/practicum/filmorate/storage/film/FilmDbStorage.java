@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
@@ -21,7 +20,10 @@ import ru.yandex.practicum.filmorate.storage.mappers.GenreMapper;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @Repository
@@ -29,7 +31,6 @@ import java.util.*;
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "db")
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
-    private final GenreDbStorage genreDbStorage;
 
     @Override
     public Film addObject(Film object) {

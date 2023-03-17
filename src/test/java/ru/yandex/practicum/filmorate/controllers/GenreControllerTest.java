@@ -11,6 +11,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.yandex.practicum.filmorate.model.Genre;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,7 +36,7 @@ class GenreControllerTest {
                         get("/genres/1")).andDo(print())
                 .andExpectAll(
                         status().isOk(),
-                        result -> assertEquals(expectGenre, objectMapper.readValue(result.getResponse().getContentAsString(),
+                        result -> assertEquals(expectGenre, objectMapper.readValue(result.getResponse().getContentAsString(StandardCharsets.UTF_8),
                                 Genre.class), "Жанры не совпадают")
                 );
     }
