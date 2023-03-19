@@ -40,7 +40,7 @@ public class Film extends AbstractObject {
     @NotNull
     private Mpa mpa;
     private LinkedHashSet<Genre> genres = new LinkedHashSet<>();
-    private Long rate = 0L;
+    private Long rate;
 
     public void addLike(Long id) {
         filmAudience.add(id);

@@ -114,6 +114,14 @@ public class FilmDbStorage implements FilmStorage {
         List<Film> films = jdbcTemplate.query(getFilmSql, new FilmMapper());
 
         String sqlGetGenresForFilm = "SELECT * FROM film_genre INNER JOIN genre ON film_genre.genre_id=genre.genre_id WHERE film_id=?";
+//        String sqlGetGenres = "SELECT * \n" +
+//                "FROM genre \n" +
+//                "WHERE genre_id IN (\n" +
+//                "SELECT genre_id \n" +
+//                "FROM film_genre\n" +
+//                "INNER JOIN film_data ON film_genre.film_id = film_data.film_id\n" +
+//                "WHERE film_genre.film_id = film_data.film_id) \n" +
+//                "ORDER BY genre_id";
 
         for (Film film : films) {
             List<Genre> genres = jdbcTemplate.query(sqlGetGenresForFilm, new GenreMapper(), film.getId());

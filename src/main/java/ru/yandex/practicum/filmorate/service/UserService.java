@@ -5,14 +5,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
-import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.Storage;
 import ru.yandex.practicum.filmorate.storage.user.FriendStorage;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,12 +39,12 @@ public class UserService extends AbstractService<User> {
         User friend = getFriend(userId, otherUserId);
         if (friend != null) {
             log.info(LogMessages.FRIEND_UNCONFIRMED.toString());
-            Friend unconfirmedFriend = user.getFriends().stream()
-                    .filter(f -> f.getUserId() == otherUserId)
+            User unconfirmedFriend = user.getFriends().stream()
+                    .filter(f -> f.getId() == otherUserId)
                     .findFirst()
                     .orElse(null);
-            Friend otherUnconfirmedFriend = user.getFriends().stream()
-                    .filter(f -> f.getUserId() == otherUserId)
+            User otherUnconfirmedFriend = user.getFriends().stream()
+                    .filter(f -> f.getId() == otherUserId)
                     .findFirst()
                     .orElse(null);
             if(unconfirmedFriend == null || otherUnconfirmedFriend == null) {

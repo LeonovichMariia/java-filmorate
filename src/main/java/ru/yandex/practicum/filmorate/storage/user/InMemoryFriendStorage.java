@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.model.Friend;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -41,7 +40,7 @@ public class InMemoryFriendStorage implements  FriendStorage {
     public List<User> getFriends(Long userId) {
         User user = storage.findObjectById(userId);
         return user.getFriends().stream()
-                .map(Friend::getUserId)
+                .map(User::getId)
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
     }
@@ -52,7 +51,7 @@ public class InMemoryFriendStorage implements  FriendStorage {
         User otherUser = storage.findObjectById(otherId);
         return user.getFriends().stream()
                 .filter(otherUser.getFriends()::contains)
-                .map(Friend::getUserId)
+                .map(User::getId)
                 .map(storage::findObjectById)
                 .collect(Collectors.toList());
     }
