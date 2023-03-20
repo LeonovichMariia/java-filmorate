@@ -13,16 +13,16 @@ import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
+import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.storage.genre.GenreDbStorage;
 import ru.yandex.practicum.filmorate.storage.mappers.FilmMapper;
 import ru.yandex.practicum.filmorate.storage.mappers.GenreMapper;
 
 import java.sql.Date;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -30,6 +30,8 @@ import java.util.Set;
 @ConditionalOnProperty(name = "app.storage.type", havingValue = "db")
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
+    private final GenreDbStorage genreDbStorage;
+    private final FilmMapper filmMapper;
 
     @Override
     public Film addObject(Film object) {
@@ -110,25 +112,8 @@ public class FilmDbStorage implements FilmStorage {
                 "FROM film_data, mpa\n" +
                 "WHERE film_data.mpa_id = mpa.mpa_id\n" +
                 "ORDER BY film_data.film_id";
-
-        List<Film> films = jdbcTemplate.query(getFilmSql, new FilmMapper());
-
-        String sqlGetGenresForFilm = "SELECT * FROM film_genre INNER JOIN genre ON film_genre.genre_id=genre.genre_id WHERE film_id=?";
-//        String sqlGetGenres = "SELECT * \n" +
-//                "FROM genre \n" +
-//                "WHERE genre_id IN (\n" +
-//                "SELECT genre_id \n" +
-//                "FROM film_genre\n" +
-//                "INNER JOIN film_data ON film_genre.film_id = film_data.film_id\n" +
-//                "WHERE film_genre.film_id = film_data.film_id) \n" +
-//                "ORDER BY genre_id";
-
-        for (Film film : films) {
-            List<Genre> genres = jdbcTemplate.query(sqlGetGenresForFilm, new GenreMapper(), film.getId());
-            film.setGenres(new LinkedHashSet<>(genres));
-        }
-
-        return films;
+        Map<Long, List<Genre>> genresForFilm = genreDbStorage.getGenresForFilms();
+        return jdbcTemplate.query(getFilmSql, ((rs, rowNum) -> mapRow(rs, genresForFilm)));
     }
 
     private void saveGenresToFilm(Film film) {
@@ -153,5 +138,25 @@ public class FilmDbStorage implements FilmStorage {
                         return genreList.size();
                     }
                 });
+    }
+
+    private Film mapRow(ResultSet rs, Map<Long, List<Genre>> filmsGenres) throws SQLException {
+        Film film = Film.builder()
+                .id(rs.getLong("film_id"))
+                .name(rs.getString("name"))
+                .description(rs.getString("description"))
+                .releaseDate(rs.getDate("release_date").toLocalDate())
+                .duration(rs.getInt("duration"))
+                .rate(rs.getLong("rate"))
+                .mpa(
+                        Mpa.builder()
+                                .id(rs.getLong("mpa_id"))
+                                .name(rs.getString("mpa_name"))
+                                .build()
+                )
+                .build();
+        List<Genre> filmGenres = filmsGenres.getOrDefault(rs.getLong("film_id"), new ArrayList<>());
+        film.setGenres(new LinkedHashSet<>(filmGenres));
+        return film;
     }
 }

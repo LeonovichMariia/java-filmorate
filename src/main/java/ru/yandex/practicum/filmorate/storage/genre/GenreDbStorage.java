@@ -10,7 +10,7 @@ import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.mappers.GenreMapper;
 
-import java.util.List;
+import java.util.*;
 
 @Slf4j
 @Repository
@@ -33,5 +33,24 @@ public class GenreDbStorage implements GenreStorage {
     public List<Genre> getAllGenres() {
         String sql = "SELECT * FROM genre ORDER BY genre_id";
         return jdbcTemplate.query(sql, new GenreMapper());
+    }
+
+    @Override
+    public Map<Long, List<Genre>> getGenresForFilms() {
+        String sql = "SELECT g.*, \n" +
+                "fg.film_id  \n" +
+                "FROM genre AS g, film_genre fg \n" +
+                "WHERE g.genre_id = fg.genre_id";
+        return jdbcTemplate.query(sql,
+                rs -> {
+                    Map<Long, List<Genre>> filmList = new HashMap<>();
+                    while (rs.next()) {
+                        long filmId = rs.getLong("film_id");
+                        List<Genre> genreList = new ArrayList<>();
+                        genreList.add(new Genre(rs.getLong("genre_id"), rs.getString("genre_name")));
+                        filmList.put(filmId, genreList);
+                    }
+                    return filmList;
+                });
     }
 }

@@ -26,6 +26,8 @@ public class User extends AbstractObject {
         this.birthday = birthday;
     }
 
+    public User() {}
+
     @Email(message = AnnotationMessages.INCORRECT_EMAIL)
     @NotBlank(message = AnnotationMessages.EMPTY_EMAIL)
     private String email;
@@ -37,8 +39,6 @@ public class User extends AbstractObject {
     private LocalDate birthday;
     @JsonIgnore
     private final Set<User> friends = new HashSet<>();
-
-    public User() {}
 
     private boolean isFriendshipConfirmed;
 
