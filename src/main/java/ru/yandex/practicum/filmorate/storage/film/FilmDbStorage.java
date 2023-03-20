@@ -31,7 +31,6 @@ import java.util.*;
 public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreDbStorage genreDbStorage;
-    private final FilmMapper filmMapper;
 
     @Override
     public Film addObject(Film object) {
