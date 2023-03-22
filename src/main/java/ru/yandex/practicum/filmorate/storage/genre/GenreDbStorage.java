@@ -42,7 +42,8 @@ public class GenreDbStorage implements GenreStorage {
         String sql = "SELECT g.*, \n" +
                 "fg.film_id  \n" +
                 "FROM genre AS g, film_genre fg \n" +
-                "WHERE g.genre_id = fg.genre_id";
+                "WHERE g.genre_id = fg.genre_id\n" +
+                "GROUP BY fg.film_id, fg.genre_id";
         return jdbcTemplate.query(sql,
                 rs -> {
                     Map<Long, List<Genre>> filmList = new HashMap<>();
