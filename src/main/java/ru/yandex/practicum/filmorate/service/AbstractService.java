@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exceptions.ObjectNotFoundException;
 import ru.yandex.practicum.filmorate.exceptions.ValidationException;
 import ru.yandex.practicum.filmorate.messages.LogMessages;
 import ru.yandex.practicum.filmorate.model.AbstractObject;
@@ -17,6 +18,7 @@ public abstract class AbstractService<T extends AbstractObject> {
     protected void checkIfObjectNull(T object) {
         if (object == null) {
             log.warn(LogMessages.NULL_OBJECT.toString());
+            throw new ObjectNotFoundException(LogMessages.NULL_OBJECT.toString());
         }
     }
 

@@ -2,10 +2,11 @@ package ru.yandex.practicum.filmorate.model;
 
 import lombok.*;
 
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
+@EqualsAndHashCode
+@NoArgsConstructor
+@AllArgsConstructor
 public abstract class AbstractObject {
     private Long id;
 }
